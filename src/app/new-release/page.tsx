@@ -7,10 +7,43 @@ import { PageTitle } from "@/components/PageTitle";
 import { Reveal } from "@/components/Reveal";
 import { useLanguage } from "@/i18n/LanguageContext";
 import { LazyYouTube } from "@/components/LazyYouTube";
+import { useEffect, useState } from "react";
+
+type WordPressPost = {
+  id: number;
+  title: { rendered: string };
+  excerpt: { rendered: string };
+};
 
 export default function NewReleasePage() {
   const { t } = useLanguage();
   const p = t.pages.newRelease;
+  const [posts, setPosts] = useState<WordPressPost[]>([]);
+  const [loadingPosts, setLoadingPosts] = useState(true);
+  const [postsError, setPostsError] = useState<string | null>(null);
+
+  useEffect(() => {
+    const fetchPosts = async () => {
+      try {
+        const response = await fetch(
+          "https://primary-production-012cd.up.railway.app/wp-json/wp/v2/posts"
+        );
+        if (!response.ok) {
+          throw new Error(`Failed to fetch posts: ${response.status}`);
+        }
+        const data: WordPressPost[] = await response.json();
+        setPosts(data);
+      } catch (error) {
+        setPostsError(
+          error instanceof Error ? error.message : "Failed to fetch posts"
+        );
+      } finally {
+        setLoadingPosts(false);
+      }
+    };
+
+    fetchPosts();
+  }, []);
 
   return (
     <div className="relative overflow-hidden py-10 sm:py-14 md:py-16 bg-sky-50 min-h-screen">
@@ -168,6 +201,38 @@ export default function NewReleasePage() {
             </div>
           </Reveal>
         </div>
+        
+        <Reveal delay={0.1}>
+          <div className="mt-6 sm:mt-10 rounded-2xl sm:rounded-[1.75rem] border border-slate-200 bg-white p-5 sm:p-6 shadow-[0_18px_50px_rgba(15,23,42,0.08)]">
+            <h2 className="text-xl font-bold tracking-tight text-slate-900 sm:text-2xl">
+              WordPress Posts
+            </h2>
+
+            {loadingPosts && (
+              <p className="mt-4 text-sm text-slate-600">Loading posts...</p>
+            )}
+
+            {postsError && (
+              <p className="mt-4 text-sm text-red-600">{postsError}</p>
+            )}
+
+            {!loadingPosts && !postsError && (
+              <div className="mt-4 space-y-4">
+                {posts.map((post) => (
+                  <article key={post.id} className="rounded-xl border border-slate-200 p-4">
+                    <h3 className="text-lg font-semibold text-slate-900">
+                      {post.title.rendered}
+                    </h3>
+                    <div
+                      className="mt-2 text-sm text-slate-700"
+                      dangerouslySetInnerHTML={{ __html: post.excerpt.rendered }}
+                    />
+                  </article>
+                ))}
+              </div>
+            )}
+          </div>
+        </Reveal>
       </Container>
     </div>
   );
