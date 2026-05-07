@@ -13,6 +13,7 @@ type NewReleasePageData = {
   acf?: {
     hero_title?: string;
     hero_subtitle?: string;
+    eTaxInvoiceReceipt?: string;
     etax_heading?: string;
     tax_invoice_subtitle?: string;
 
@@ -193,14 +194,21 @@ export default function NewReleasePage() {
           <div className="mt-6 sm:mt-10 overflow-hidden rounded-2xl sm:rounded-[2rem] border border-slate-200 bg-white shadow-[0_28px_80px_rgba(15,23,42,0.06)]">
             <div className="border-b border-slate-200 bg-white px-5 py-6 sm:px-8 sm:py-8 md:px-10 md:py-10">
               <div className="flex flex-col gap-5 sm:gap-6 lg:flex-row lg:items-end lg:justify-between">
+                {/* eTax Header */}
                 <div className="max-w-2xl">
+                  
+                  {/* H2 */}
                   <h2 className="text-xl font-bold tracking-tight text-slate-900 sm:text-2xl md:text-3xl">
-                    {pageData?.acf?.etax_heading || p.eTaxHeading}
+                    {pageData?.acf?.eTaxInvoiceReceipt || p.eTaxInvoiceReceipt}
                   </h2>
 
+                  {/* H4 */}
+                  <h4 className="mt-2 sm:mt-3 text-base font-medium text-slate-700">
+                    {pageData?.acf?.etax_heading || p.eTaxHeading}
+                  </h4>
+
                   <p className="mt-2 sm:mt-3 text-sm leading-6 text-slate-600">
-                    {pageData?.acf?.tax_invoice_subtitle ||
-                      p.taxInvoiceSubtitle}
+                    {pageData?.acf?.tax_invoice_subtitle || p.taxInvoiceSubtitle}
                   </p>
                 </div>
 

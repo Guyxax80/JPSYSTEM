@@ -76,6 +76,7 @@ export const translations = {
         metaTitle: "New Release",
         title: "New Release",
         subtitle: "Clean, focused product updates with enterprise polish.",
+        eTaxInvoiceReceipt: "E-Tax Invoice & E-Receipt",
         eTaxHeading: "Refers to the use of tax invoices,",
         taxInvoiceSubtitle: "Tax Invoice (Paper medium)",
         costTable: {
@@ -437,6 +438,7 @@ export const translations = {
         metaTitle: "ผลิตภัณฑ์ใหม่",
         title: "ผลิตภัณฑ์ใหม่",
         subtitle: "อัปเดตผลิตภัณฑ์แบบเรียบหรู พร้อมใช้งานในองค์กร",
+        eTaxInvoiceReceipt: "ใบกำกับภาษีอิเล็กทรอนิกส์ & ใบเสร็จอิเล็กทรอนิกส์",
         eTaxHeading: "หมายถึงการใช้ใบกำกับภาษี,",
         taxInvoiceSubtitle: "ใบกำกับภาษี (รูปแบบกระดาษ)",
         costTable: {
@@ -796,6 +798,7 @@ export const translations = {
         metaTitle: "新製品",
         title: "新発売",
         subtitle: "洗練されたプロダクト情報を、静かな余白で。",
+        eTaxInvoiceReceipt: "電子請求書 & 電子レシート",
         eTaxHeading: "税務請求書の利用について",
         taxInvoiceSubtitle: "税務請求書（紙媒体）",
         costTable: {
