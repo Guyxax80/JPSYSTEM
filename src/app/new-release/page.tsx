@@ -9,40 +9,80 @@ import { useLanguage } from "@/i18n/LanguageContext";
 import { LazyYouTube } from "@/components/LazyYouTube";
 import { useEffect, useState } from "react";
 
-type WordPressPost = {
-  id: number;
-  title: { rendered: string };
-  excerpt: { rendered: string };
+type NewReleasePageData = {
+  acf: {
+    hero_title: string;
+    hero_subtitle: string;
+    etax_heading: string;
+    monthly_cost: string;
+    top_image: number;
+    bottom_image: number;
+    mylogstar: number;
+    youtube_url: string;
+  };
 };
 
 export default function NewReleasePage() {
   const { t } = useLanguage();
   const p = t.pages.newRelease;
-  const [posts, setPosts] = useState<WordPressPost[]>([]);
-  const [loadingPosts, setLoadingPosts] = useState(true);
-  const [postsError, setPostsError] = useState<string | null>(null);
+
+  const [pageData, setPageData] =
+    useState<NewReleasePageData | null>(null);
+
+  const [topImage, setTopImage] = useState("");
+  const [bottomImage, setBottomImage] = useState("");
+  const [mylogstarImage, setMylogstarImage] = useState("");
+
+  const getMedia = async (id: number) => {
+    const res = await fetch(
+      `https://primary-production-012cd.up.railway.app/wp-json/wp/v2/media/${id}`
+    );
+
+    return await res.json();
+  };
+
+  const getYoutubeId = (url: string) => {
+    try {
+      const urlObj = new URL(url);
+      return urlObj.searchParams.get("v") || "R8GhVnNnbV8";
+    } catch {
+      return "R8GhVnNnbV8";
+    }
+  };
 
   useEffect(() => {
-    const fetchPosts = async () => {
+    const fetchPageData = async () => {
       try {
         const response = await fetch(
-          "https://primary-production-012cd.up.railway.app/wp-json/wp/v2/posts"
+          "https://primary-production-012cd.up.railway.app/wp-json/wp/v2/pages?slug=new-release"
         );
-        if (!response.ok) {
-          throw new Error(`Failed to fetch posts: ${response.status}`);
+
+        const data = await response.json();
+
+        const page = data[0];
+
+        setPageData(page);
+
+        if (page.acf.top_image) {
+          const media = await getMedia(page.acf.top_image);
+          setTopImage(media.source_url);
         }
-        const data: WordPressPost[] = await response.json();
-        setPosts(data);
+
+        if (page.acf.bottom_image) {
+          const media = await getMedia(page.acf.bottom_image);
+          setBottomImage(media.source_url);
+        }
+
+        if (page.acf.mylogstar) {
+          const media = await getMedia(page.acf.mylogstar);
+          setMylogstarImage(media.source_url);
+        }
       } catch (error) {
-        setPostsError(
-          error instanceof Error ? error.message : "Failed to fetch posts"
-        );
-      } finally {
-        setLoadingPosts(false);
+        console.error(error);
       }
     };
 
-    fetchPosts();
+    fetchPageData();
   }, []);
 
   return (
@@ -50,7 +90,7 @@ export default function NewReleasePage() {
       <PageTitle title={p.metaTitle} />
 
       <Container>
-        {/* --- ส่วนหัว Hero Section --- */}
+        {/* Hero Section */}
         <Reveal>
           <div className="relative overflow-hidden rounded-2xl sm:rounded-[2.5rem] bg-slate-900 px-5 py-12 sm:px-8 sm:py-16 md:px-12 md:py-20 border border-slate-100 shadow-xl">
             <div className="absolute inset-0 z-0">
@@ -68,32 +108,35 @@ export default function NewReleasePage() {
 
             <div className="relative z-10 mx-auto max-w-2xl text-center text-white">
               <h1 className="text-2xl font-bold tracking-tight sm:text-4xl md:text-5xl drop-shadow-lg">
-                {p.title}
+                {pageData?.acf.hero_title || p.title}
               </h1>
+
               <p className="mt-3 sm:mt-4 text-base sm:text-lg leading-7 sm:leading-8 text-white/80 font-normal drop-shadow-md">
-                {p.subtitle}
+                {pageData?.acf.hero_subtitle || p.subtitle}
               </p>
             </div>
           </div>
         </Reveal>
 
-        {/* --- ส่วนเนื้อหา e-Tax Section --- */}
+        {/* eTax Section */}
         <Reveal delay={0.06}>
           <div className="mt-6 sm:mt-10 overflow-hidden rounded-2xl sm:rounded-[2rem] border border-slate-200 bg-white shadow-[0_28px_80px_rgba(15,23,42,0.06)]">
             <div className="border-b border-slate-200 bg-white px-5 py-6 sm:px-8 sm:py-8 md:px-10 md:py-10">
               <div className="flex flex-col gap-5 sm:gap-6 lg:flex-row lg:items-end lg:justify-between">
                 <div className="max-w-2xl">
                   <h2 className="text-xl font-bold tracking-tight text-slate-900 sm:text-2xl md:text-3xl">
-                    {p.eTaxHeading}
+                    {pageData?.acf.etax_heading || p.eTaxHeading}
                   </h2>
+
                   <p className="mt-2 sm:mt-3 text-sm leading-6 text-slate-600">
                     {p.taxInvoiceSubtitle}
                   </p>
                 </div>
+
                 <div className="shrink-0">
                   <div className="aspect-[5/3] w-full overflow-hidden rounded-2xl sm:rounded-3xl border border-slate-200 bg-slate-50 lg:w-56">
                     <Image
-                      src="/topimg-new-release.jpg"
+                      src={topImage || "/topimg-new-release.jpg"}
                       alt="New release top visual"
                       width={560}
                       height={336}
@@ -108,47 +151,61 @@ export default function NewReleasePage() {
             </div>
 
             <div className="bg-white px-5 py-6 sm:px-8 sm:py-8 md:px-10 md:py-10">
-              {/* ตารางคำนวณ */}
+              {/* Cost Table */}
               <div className="grid gap-2 sm:gap-3 rounded-2xl sm:rounded-3xl border border-slate-200 bg-slate-50 p-4 sm:p-6 text-sm text-slate-700 sm:text-base">
                 <div className="grid grid-cols-[1fr_auto] sm:grid-cols-[minmax(160px,1fr)_minmax(120px,auto)] gap-3 sm:gap-4 font-semibold text-slate-900">
-                  <div className="text-sm sm:text-base">{p.costTable.option}</div>
-                  <div className="text-right text-sm sm:text-base">{p.costTable.value}</div>
+                  <div>{p.costTable.option}</div>
+                  <div className="text-right">{p.costTable.value}</div>
                 </div>
+
                 <div className="grid grid-cols-[1fr_auto] sm:grid-cols-[minmax(160px,1fr)_minmax(120px,auto)] gap-3 sm:gap-4 border-t border-slate-200 pt-3 sm:pt-4">
-                  <div className="text-sm sm:text-base">{p.costTable.usePaper}</div>
-                  <div className="text-right text-sm sm:text-base">{p.costTable.usePaperVal}</div>
+                  <div>{p.costTable.usePaper}</div>
+                  <div className="text-right">{p.costTable.usePaperVal}</div>
                 </div>
+
                 <div className="grid grid-cols-[1fr_auto] sm:grid-cols-[minmax(160px,1fr)_minmax(120px,auto)] gap-3 sm:gap-4 border-t border-slate-200 pt-3 sm:pt-4">
-                  <div className="text-sm sm:text-base">{p.costTable.printingFee}</div>
-                  <div className="text-right text-sm sm:text-base">{p.costTable.printingFeeVal}</div>
+                  <div>{p.costTable.printingFee}</div>
+                  <div className="text-right">{p.costTable.printingFeeVal}</div>
                 </div>
+
                 <div className="grid grid-cols-[1fr_auto] sm:grid-cols-[minmax(160px,1fr)_minmax(120px,auto)] gap-3 sm:gap-4 border-t border-slate-200 pt-3 sm:pt-4">
-                  <div className="text-sm sm:text-base">{p.costTable.storageMaterial}</div>
-                  <div className="text-right text-sm sm:text-base">{p.costTable.storageMaterialVal}</div>
+                  <div>{p.costTable.storageMaterial}</div>
+                  <div className="text-right">{p.costTable.storageMaterialVal}</div>
                 </div>
+
                 <div className="grid grid-cols-[1fr_auto] sm:grid-cols-[minmax(160px,1fr)_minmax(120px,auto)] gap-3 sm:gap-4 border-t border-slate-200 pt-3 sm:pt-4">
-                  <div className="text-sm sm:text-base">{p.costTable.deliveryFee}</div>
-                  <div className="text-right text-sm sm:text-base">{p.costTable.deliveryFeeVal}</div>
+                  <div>{p.costTable.deliveryFee}</div>
+                  <div className="text-right">{p.costTable.deliveryFeeVal}</div>
                 </div>
+
                 <div className="grid grid-cols-[1fr_auto] sm:grid-cols-[minmax(160px,1fr)_minmax(120px,auto)] gap-3 sm:gap-4 border-t border-slate-200 pt-3 sm:pt-4">
-                  <div className="font-semibold text-red-600 text-sm sm:text-base">{p.costTable.total}</div>
-                  <div className="text-right font-semibold text-red-600 text-sm sm:text-base">{p.costTable.totalVal}</div>
+                  <div className="font-semibold text-red-600">
+                    {p.costTable.total}
+                  </div>
+
+                  <div className="text-right font-semibold text-red-600">
+                    {p.costTable.totalVal}
+                  </div>
                 </div>
               </div>
 
-              {/* ส่วนสรุปรายเดือน */}
+              {/* Monthly Cost */}
               <div className="mt-6 sm:mt-8 rounded-2xl sm:rounded-3xl border border-slate-200 bg-white p-5 sm:p-6 shadow-[0_16px_36px_rgba(15,23,42,0.06)] text-sm text-slate-700 sm:text-base">
                 <div className="flex flex-col sm:flex-row items-start gap-3 sm:gap-4">
                   <div className="grid h-10 w-10 sm:h-12 sm:w-12 flex-shrink-0 place-items-center rounded-xl sm:rounded-2xl border border-slate-200 bg-slate-50 text-slate-900">
                     <span className="text-base sm:text-lg font-bold">£</span>
                   </div>
+
                   <div className="min-w-0 w-full">
                     <div className="font-semibold text-slate-900">
                       {p.monthlyCostLabel}
                     </div>
+
                     <div className="mt-2 sm:mt-3 text-sm sm:text-base font-bold leading-6 text-red-600">
-                      {p.monthlyCostValue}
+                      {pageData?.acf.monthly_cost ||
+                        p.monthlyCostValue}
                     </div>
+
                     <div className="mt-1 sm:mt-2 text-xs sm:text-sm font-semibold leading-6 text-red-600">
                       {p.monthlyCostReduction}
                     </div>
@@ -168,11 +225,18 @@ export default function NewReleasePage() {
           </div>
         </Reveal>
 
-        {/* --- ส่วนวิดีโอและรูปภาพด้านล่าง --- */}
+        {/* Video + Image */}
         <div className="mt-6 sm:mt-10 grid gap-5 sm:gap-6 lg:grid-cols-[1.3fr_0.9fr]">
           <Reveal delay={0.08}>
             <div className="rounded-2xl sm:rounded-[1.75rem] border border-slate-200 bg-white p-4 sm:p-6 shadow-[0_18px_50px_rgba(15,23,42,0.08)]">
-              <LazyYouTube videoId="R8GhVnNnbV8" title="My Log Star video" />
+              <LazyYouTube
+                videoId={
+                  pageData?.acf.youtube_url
+                    ? getYoutubeId(pageData.acf.youtube_url)
+                    : "R8GhVnNnbV8"
+                }
+                title="My Log Star video"
+              />
             </div>
           </Reveal>
 
@@ -180,7 +244,7 @@ export default function NewReleasePage() {
             <div className="relative rounded-2xl sm:rounded-[1.75rem] border border-slate-200 bg-white p-4 sm:p-6 shadow-[0_18px_50px_rgba(15,23,42,0.08)] flex flex-col h-full">
               <div className="overflow-hidden rounded-xl sm:rounded-3xl border border-slate-200 bg-slate-50">
                 <Image
-                  src="/botimg_new-release.png"
+                  src={bottomImage || "/botimg_new-release.png"}
                   alt="Bottom new release visual"
                   width={1200}
                   height={720}
@@ -201,38 +265,6 @@ export default function NewReleasePage() {
             </div>
           </Reveal>
         </div>
-        
-        <Reveal delay={0.1}>
-          <div className="mt-6 sm:mt-10 rounded-2xl sm:rounded-[1.75rem] border border-slate-200 bg-white p-5 sm:p-6 shadow-[0_18px_50px_rgba(15,23,42,0.08)]">
-            <h2 className="text-xl font-bold tracking-tight text-slate-900 sm:text-2xl">
-              WordPress Posts
-            </h2>
-
-            {loadingPosts && (
-              <p className="mt-4 text-sm text-slate-600">Loading posts...</p>
-            )}
-
-            {postsError && (
-              <p className="mt-4 text-sm text-red-600">{postsError}</p>
-            )}
-
-            {!loadingPosts && !postsError && (
-              <div className="mt-4 space-y-4">
-                {posts.map((post) => (
-                  <article key={post.id} className="rounded-xl border border-slate-200 p-4">
-                    <h3 className="text-lg font-semibold text-slate-900">
-                      {post.title.rendered}
-                    </h3>
-                    <div
-                      className="mt-2 text-sm text-slate-700"
-                      dangerouslySetInnerHTML={{ __html: post.excerpt.rendered }}
-                    />
-                  </article>
-                ))}
-              </div>
-            )}
-          </div>
-        </Reveal>
       </Container>
     </div>
   );
