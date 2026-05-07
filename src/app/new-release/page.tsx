@@ -29,14 +29,18 @@ export default function NewReleasePage() {
   const [pageData, setPageData] =
     useState<NewReleasePageData | null>(null);
 
-  const [topImage, setTopImage] = useState("");
-  const [bottomImage, setBottomImage] = useState("");
-  const [mylogstarImage, setMylogstarImage] = useState("");
+  const [topImage, setTopImage] = useState<string | null>(null);
+  const [bottomImage, setBottomImage] = useState<string | null>(null);
+  const [mylogstarImage, setMylogstarImage] = useState<string | null>(null);
 
   const getMedia = async (id: number) => {
     const res = await fetch(
       `https://primary-production-012cd.up.railway.app/wp-json/wp/v2/media/${id}`
     );
+
+    if (!res.ok) {
+      throw new Error("Failed to fetch media");
+    }
 
     return await res.json();
   };
@@ -44,6 +48,11 @@ export default function NewReleasePage() {
   const getYoutubeId = (url: string) => {
     try {
       const urlObj = new URL(url);
+
+      if (urlObj.hostname.includes("youtu.be")) {
+        return urlObj.pathname.replace("/", "");
+      }
+
       return urlObj.searchParams.get("v") || "R8GhVnNnbV8";
     } catch {
       return "R8GhVnNnbV8";
@@ -57,25 +66,55 @@ export default function NewReleasePage() {
           "https://primary-production-012cd.up.railway.app/wp-json/wp/v2/pages?slug=new-release"
         );
 
+        if (!response.ok) {
+          throw new Error("Failed to fetch page");
+        }
+
         const data = await response.json();
+
+        if (!data || !data.length) return;
 
         const page = data[0];
 
         setPageData(page);
 
-        if (page.acf.top_image) {
-          const media = await getMedia(page.acf.top_image);
-          setTopImage(media.source_url);
+        // TOP IMAGE
+        if (page?.acf?.top_image) {
+          try {
+            const media = await getMedia(page.acf.top_image);
+
+            if (media?.source_url) {
+              setTopImage(media.source_url);
+            }
+          } catch (err) {
+            console.error("Top image error:", err);
+          }
         }
 
-        if (page.acf.bottom_image) {
-          const media = await getMedia(page.acf.bottom_image);
-          setBottomImage(media.source_url);
+        // BOTTOM IMAGE
+        if (page?.acf?.bottom_image) {
+          try {
+            const media = await getMedia(page.acf.bottom_image);
+
+            if (media?.source_url) {
+              setBottomImage(media.source_url);
+            }
+          } catch (err) {
+            console.error("Bottom image error:", err);
+          }
         }
 
-        if (page.acf.mylogstar) {
-          const media = await getMedia(page.acf.mylogstar);
-          setMylogstarImage(media.source_url);
+        // MYLOGSTAR IMAGE
+        if (page?.acf?.mylogstar) {
+          try {
+            const media = await getMedia(page.acf.mylogstar);
+
+            if (media?.source_url) {
+              setMylogstarImage(media.source_url);
+            }
+          } catch (err) {
+            console.error("Mylogstar image error:", err);
+          }
         }
       } catch (error) {
         console.error(error);
@@ -103,6 +142,7 @@ export default function NewReleasePage() {
                 className="object-cover"
                 priority
               />
+
               <div className="absolute inset-0 bg-black/20" />
             </div>
 
@@ -142,7 +182,7 @@ export default function NewReleasePage() {
                       height={336}
                       sizes="(max-width: 1024px) 90vw, 224px"
                       quality={65}
-                      loading="lazy"
+                      unoptimized
                       className="h-full w-full object-cover"
                     />
                   </div>
@@ -249,7 +289,7 @@ export default function NewReleasePage() {
                   width={1200}
                   height={720}
                   sizes="(max-width: 1024px) 90vw, 40vw"
-                  loading="lazy"
+                  unoptimized
                   className="h-full w-full object-cover"
                 />
               </div>
