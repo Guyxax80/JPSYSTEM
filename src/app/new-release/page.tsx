@@ -176,16 +176,15 @@ export default function NewReleasePage() {
 
                 <div className="shrink-0">
                   <div className="aspect-[5/3] w-full overflow-hidden rounded-2xl sm:rounded-3xl border border-slate-200 bg-slate-50 lg:w-56">
-                    <Image
-                      src={mylogstarImage || "/topimg-new-release.jpg"}
-                      alt="New release top visual"
-                      width={560}
-                      height={336}
-                      sizes="(max-width: 1024px) 90vw, 224px"
-                      quality={65}
-                      unoptimized
-                      className="h-full w-full object-cover"
-                    />
+                      <Image
+                        src={bottomImage || "/botimg_new-release.png"}
+                        alt="Bottom new release visual"
+                        width={1200}
+                        height={720}
+                        sizes="(max-width: 1024px) 90vw, 40vw"
+                        unoptimized
+                        className="h-full w-full object-cover"
+                      />
                   </div>
                 </div>
               </div>
@@ -284,15 +283,16 @@ export default function NewReleasePage() {
           <Reveal>
             <div className="relative rounded-2xl sm:rounded-[1.75rem] border border-slate-200 bg-white p-4 sm:p-6 shadow-[0_18px_50px_rgba(15,23,42,0.08)] flex flex-col h-full">
               <div className="overflow-hidden rounded-xl sm:rounded-3xl border border-slate-200 bg-slate-50">
-                <Image
-                  src={bottomImage || "/botimg_new-release.png"}
-                  alt="Bottom new release visual"
-                  width={1200}
-                  height={720}
-                  sizes="(max-width: 1024px) 90vw, 40vw"
-                  unoptimized
-                  className="h-full w-full object-cover"
-                />
+                    <Image
+                      src={mylogstarImage || "/topimg-new-release.jpg"}
+                      alt="New release top visual"
+                      width={560}
+                      height={336}
+                      sizes="(max-width: 1024px) 90vw, 224px"
+                      quality={65}
+                      unoptimized
+                      className="h-full w-full object-cover"
+                    />
               </div>
 
               <div className="mt-4 sm:mt-6 flex justify-center sm:justify-end">
