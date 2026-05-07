@@ -134,13 +134,14 @@ export default function NewReleasePage() {
           <div className="relative overflow-hidden rounded-2xl sm:rounded-[2.5rem] bg-slate-900 px-5 py-12 sm:px-8 sm:py-16 md:px-12 md:py-20 border border-slate-100 shadow-xl">
             <div className="absolute inset-0 z-0">
               <Image
-                src="/topBG-new-releasesss.jpg"
+                src={topImage || "/topBG-new-releasesss.jpg"}
                 alt="Background visual"
                 fill
                 sizes="(max-width: 768px) 95vw, 90vw"
                 quality={60}
                 className="object-cover"
                 priority
+                unoptimized
               />
 
               <div className="absolute inset-0 bg-black/20" />
@@ -176,7 +177,7 @@ export default function NewReleasePage() {
                 <div className="shrink-0">
                   <div className="aspect-[5/3] w-full overflow-hidden rounded-2xl sm:rounded-3xl border border-slate-200 bg-slate-50 lg:w-56">
                     <Image
-                      src={topImage || "/topimg-new-release.jpg"}
+                      src={mylogstarImage || "/topimg-new-release.jpg"}
                       alt="New release top visual"
                       width={560}
                       height={336}
