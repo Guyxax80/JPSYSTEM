@@ -58,7 +58,7 @@ export default function NewReleasePage() {
   const slugMap: Record<string, string> = {
   en: "new-release",
   th: "new-release-th",
-  ja: "new-release-jp",
+  jp: "new-release-jp",
 };
 
   const [pageData, setPageData] =
