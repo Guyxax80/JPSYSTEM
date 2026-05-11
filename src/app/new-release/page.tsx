@@ -53,8 +53,13 @@ type NewReleasePageData = {
 };
 
 export default function NewReleasePage() {
-  const { t } = useLanguage();
+  const { t, lang } = useLanguage(); 
   const p = t.pages.newRelease;
+  const slugMap: Record<string, string> = {
+  en: "new-release",
+  th: "new-release-th",
+  ja: "new-release-jp",
+};
 
   const [pageData, setPageData] =
     useState<NewReleasePageData | null>(null);
@@ -89,70 +94,69 @@ export default function NewReleasePage() {
     }
   };
 
-  useEffect(() => {
-    const fetchPageData = async () => {
-      try {
-        const response = await fetch(
-          "https://primary-production-012cd.up.railway.app/wp-json/wp/v2/pages?slug=new-release"
-        );
+useEffect(() => {
+  const fetchPageData = async () => {
+    try {
+      const slug = slugMap[lang] || "new-release"; 
 
-        if (!response.ok) {
-          throw new Error("Failed to fetch page");
-        }
+      const response = await fetch(
+        `https://primary-production-012cd.up.railway.app/wp-json/wp/v2/pages?slug=${slug}`
+      );
 
-        const data = await response.json();
-
-        if (!data || !data.length) return;
-
-        const page = data[0];
-
-        setPageData(page);
-
-        // TOP IMAGE
-        if (page?.acf?.top_image) {
-          try {
-            const media = await getMedia(page.acf.top_image);
-
-            if (media?.source_url) {
-              setTopImage(media.source_url);
-            }
-          } catch (err) {
-            console.error("Top image error:", err);
-          }
-        }
-
-        // BOTTOM IMAGE
-        if (page?.acf?.bottom_image) {
-          try {
-            const media = await getMedia(page.acf.bottom_image);
-
-            if (media?.source_url) {
-              setBottomImage(media.source_url);
-            }
-          } catch (err) {
-            console.error("Bottom image error:", err);
-          }
-        }
-
-        // MYLOGSTAR IMAGE
-        if (page?.acf?.mylogstar) {
-          try {
-            const media = await getMedia(page.acf.mylogstar);
-
-            if (media?.source_url) {
-              setMylogstarImage(media.source_url);
-            }
-          } catch (err) {
-            console.error("Mylogstar image error:", err);
-          }
-        }
-      } catch (error) {
-        console.error(error);
+      if (!response.ok) {
+        throw new Error("Failed to fetch page");
       }
-    };
 
-    fetchPageData();
-  }, []);
+      const data = await response.json();
+
+      if (!data || !data.length) return;
+
+      const page = data[0];
+      setPageData(page);
+
+      // TOP IMAGE
+      if (page?.acf?.top_image) {
+        try {
+          const media = await getMedia(page.acf.top_image);
+          if (media?.source_url) {
+            setTopImage(media.source_url);
+          }
+        } catch (err) {
+          console.error("Top image error:", err);
+        }
+      }
+
+      // BOTTOM IMAGE
+      if (page?.acf?.bottom_image) {
+        try {
+          const media = await getMedia(page.acf.bottom_image);
+          if (media?.source_url) {
+            setBottomImage(media.source_url);
+          }
+        } catch (err) {
+          console.error("Bottom image error:", err);
+        }
+      }
+
+      // MYLOGSTAR IMAGE
+      if (page?.acf?.mylogstar) {
+        try {
+          const media = await getMedia(page.acf.mylogstar);
+          if (media?.source_url) {
+            setMylogstarImage(media.source_url);
+          }
+        } catch (err) {
+          console.error("Mylogstar image error:", err);
+        }
+      }
+
+    } catch (error) {
+      console.error(error);
+    }
+  };
+
+  fetchPageData();
+}, [lang]); 
 
   return (
     <div className="relative overflow-hidden py-10 sm:py-14 md:py-16 bg-sky-50 min-h-screen">
