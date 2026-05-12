@@ -25,7 +25,7 @@ export default function Home() {
   useEffect(() => {
     // 🔹 ดึง Home ACF
     fetch(
-      "https://primary-production-012cd.up.railway.app/wp-json/wp/v2/pages?slug=home-page-en"
+      "https://primary-production-012cd.up.railway.app/wp-json/wp/v2/pages?slug=home-page"
     )
       .then((res) => res.json())
       .then((data) => {
