@@ -14,6 +14,10 @@ const nextConfig: NextConfig = {
 
     // Allow Vercel Blob images
     remotePatterns: [
+      {
+        protocol: "https",
+        hostname: "primary-production-012cd.up.railway.app",
+      },
       { protocol: "https", hostname: "*.public.blob.vercel-storage.com" },
       { protocol: "https", hostname: "*.blob.vercel-storage.com" },
     ],
