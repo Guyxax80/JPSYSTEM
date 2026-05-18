@@ -43,7 +43,8 @@ export default function RootLayout({
   return (
     <html
       lang="en"
-      className={`${inter.variable} ${notoSansJP.variable} h-full antialiased`}
+      data-scroll-behavior="smooth"
+      className={`${inter.variable} ${notoSansJP.variable} h-full antialiased `}
     >
       <body className="min-h-full flex flex-col bg-white text-slate-900 selection:bg-sky-100 selection:text-slate-900">
         <LanguageProvider>

@@ -13,7 +13,7 @@ type NewReleasePageData = {
   acf?: {
     hero_title?: string;
     hero_subtitle?: string;
-    eTaxInvoiceReceipt?: string;
+    etaxinvoicereceipt?: string;
     etax_heading?: string;
     tax_invoice_subtitle?: string;
 
@@ -29,7 +29,7 @@ type NewReleasePageData = {
 
     youtube_url?: string;
 
-    etax_button_text?: string;
+    e_tax_button_text?: string;
     mylogstar_button_text?: string;
 
     cost_option_label?: string;
@@ -67,6 +67,7 @@ export default function NewReleasePage() {
   const [topImage, setTopImage] = useState<string | null>(null);
   const [bottomImage, setBottomImage] = useState<string | null>(null);
   const [mylogstarImage, setMylogstarImage] = useState<string | null>(null);
+  const title = pageData?.acf?.etaxinvoicereceipt?.toString().trim() || "";
 
   const getMedia = async (id: number) => {
     const res = await fetch(
@@ -203,7 +204,7 @@ useEffect(() => {
                   
                   {/* H2 */}
                   <h2 className="text-xl font-bold tracking-tight text-slate-900 sm:text-2xl md:text-3xl">
-                    {pageData?.acf?.eTaxInvoiceReceipt || p.eTaxInvoiceReceipt}
+                    {pageData?.acf?.etaxinvoicereceipt || p.eTaxInvoiceReceipt}
                   </h2>
 
                   {/* H4 */}
@@ -341,7 +342,7 @@ useEffect(() => {
                   href="/e-tax"
                   className="w-full sm:w-auto inline-flex items-center justify-center rounded-full bg-slate-900 px-5 py-3 text-sm font-semibold text-white transition-colors hover:bg-slate-800 active:scale-95"
                 >
-                  {pageData?.acf?.etax_button_text ||
+                  {pageData?.acf?.e_tax_button_text ||
                     t.common.readMore}
                 </Link>
               </div>

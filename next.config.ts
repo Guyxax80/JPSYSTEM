@@ -9,6 +9,7 @@ const nextConfig: NextConfig = {
     deviceSizes: [640, 828, 1080, 1200, 1920],
     imageSizes: [16, 32, 48, 64, 96, 128, 256],
 
+     qualities: [50, 60, 65, 75], 
     // Aggressive quality — visually identical at 75 but much smaller files
     minimumCacheTTL: 60 * 60 * 24 * 30, // 30 days cache
 

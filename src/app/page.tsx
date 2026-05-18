@@ -29,9 +29,12 @@ export default function Home() {
   }, []);
 
   // ✅ SERVICES + featured image
+
   useEffect(() => {
+    const currentLang = "en"; 
+
     fetch(
-      "https://primary-production-012cd.up.railway.app/wp-json/wp/v2/services?_embed&orderby=menu_order&order=asc"
+      `https://primary-production-012cd.up.railway.app/wp-json/wp/v2/services?_embed&orderby=menu_order&order=asc&lang=${currentLang}`
     )
       .then((res) => res.json())
       .then((data) => setServices(data));
@@ -86,7 +89,7 @@ export default function Home() {
       {/* ================= HERO ================= */}
       <section className="relative border-b border-slate-100">
         <div className="relative overflow-hidden">
-          <div className="aspect-[9/14] w-full sm:aspect-[16/10] lg:aspect-[21/9]">
+          <div className="relative aspect-[9/14] w-full sm:aspect-[16/10] lg:aspect-[21/9]">
             {home?.hero_image ? (
               <Image
                 src={heroSrc}
